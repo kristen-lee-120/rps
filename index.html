@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <title>chunking with rock, paper, scissors</title>
+    <script src="https://unpkg.com/jspsych@8.0.0"></script>
+    
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@2.0.0"></script>
+    <!-- image-keyboard response plugin -->
+    <script src="https://unpkg.com/@jspsych/plugin-image-keyboard-response@2.0.0"></script>
+    <!-- preload plugin -->
+    <script src="https://unpkg.com/@jspsych/plugin-preload@2.0.0"></script>
+
+    <script src="https://unpkg.com/@jspsych/plugin-image-button-response@2.0.0"></script>
+
+    <link href="https://unpkg.com/jspsych@8.0.0/css/jspsych.css" rel="stylesheet" type="text/css" />
+    </head>
+
+    <body>
+    </body>
+
+    <script>
+        var jsPsych = initJsPsych(
+            {
+            on_finish: function () {
+                jsPsych.data.displayData();
+            }
+            }
+        );
+        var timeline = [];
+
+        // preload rps images
+        var preload = {
+            type: jsPsychPreload,
+            images: [
+                'images/paper.jpeg',
+                'images/rock.jpeg',
+                'images/scissors.jpeg'
+            ]
+        };
+        timeline.push(preload);
+
+        // define welcome message trial
+        var welcome = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: "Welcome to the experiment. Press any key to begin."
+        };
+
+        // add the welcome trial to the timeline variable
+        timeline.push(welcome);
+
+        // define the instructions trial
+        var instructions = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
+            <p>blah blah play rock paper scissors.</p>
+            <p>Click on the gesture that would beat the presented one.</p>
+            <p>Press any key to begin.</p>
+        `
+        };
+
+        // add instructions trial to the tl
+        timeline.push(instructions);
+
+        jsPsych.run(timeline);
+
+    </script>
+</html>

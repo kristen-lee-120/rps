@@ -22,12 +22,14 @@ const computeOutcome = (playerMove, botMove) => {
 };
 
 const buildRound = (jsPsych, policy, botHistory, roundIndex, isPractice) => {
+    let keyboardListener = null;
     const countdown = {
         type: jsPsychHtmlKeyboardResponse,
         choices,
         stimulus:
-            '<div id="countdown" style="font-size:64px;font-weight:600;">Rock</div>',
+            '<div style="text-align:center;"><div id="countdown" style="font-size:64px;font-weight:600;">Rock</div></div>',
         trial_duration: 3000,
+        response_ends_trial: false,
         data: {
             trial_type: "rps",
             round_index: roundIndex,

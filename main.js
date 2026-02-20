@@ -88,7 +88,7 @@ const buildRound = (jsPsych, policy, botHistory, roundIndex, isPractice) => {
             const botLabel = botMove ? moveToLabel[botMove] : "Unknown";
             const imageName = botMove ? keyToMove[botMove] : null;
             const imageTag = imageName
-                ? `<img src="images/${imageName}.jpeg" alt="${botLabel}" style="width:240px;height:auto;margin:12px auto 24px;display:block;" />`
+                ? `<img src="images/${imageName}.png" alt="${botLabel}" style="width:240px;height:auto;margin:12px auto 24px;display:block;" />`
                 : "";
             return `
                 <div style="font-size:48px;font-weight:600;margin-bottom:12px;">Go!</div>

@@ -175,7 +175,7 @@ const startExperiment = async () => {
     };
 
     const totalPracticeRounds = 5;
-    const totalExperimentRounds = 100;
+    const totalExperimentRounds = 50;
 
     const practicePhaseIntro = {
         type: jsPsychHtmlKeyboardResponse,

@@ -142,7 +142,7 @@ const startExperiment = async () => {
     });
     console.log(`Chunk: ${policy.chunk.join(", ")}`);
 
-    const instructions = {
+    const instructionsBasics = {
         type: jsPsychHtmlKeyboardResponse,
         choices: [" "],
         stimulus: `
@@ -151,6 +151,18 @@ const startExperiment = async () => {
                 <p>Use the keys <strong>R</strong>, <strong>P</strong>, and <strong>S</strong> to respond.</p>
                 <p>The game will count down: rock, paper, scissors.</p>
                 <p>You must respond before "Go!" or the round will count as a loss.</p>
+                <p>Press the space bar to continue.</p>
+            </div>
+        `,
+    };
+    const instructionsPolicy = {
+        type: jsPsychHtmlKeyboardResponse,
+        choices: [" "],
+        stimulus: `
+            <div style="font-size:28px;line-height:1.4;">
+                <p>The computer does not play completely randomly.</p>
+                <p>Look out for the <i>key move</i>: if the computer plays the key move, it will start a short sequence.</p>
+                <p>If you spot the pattern, you can use it to your advantage!</p>
                 <p>Press the space bar to begin.</p>
             </div>
         `,
@@ -162,13 +174,44 @@ const startExperiment = async () => {
         message: "<p>Loading game assets...</p>",
     };
 
-    const practiceRounds = buildRound(jsPsych, policy, 0, true);
+    const totalPracticeRounds = 5;
+    const totalExperimentRounds = 100;
 
-    const totalRounds = 50;
+    const practicePhaseIntro = {
+        type: jsPsychHtmlKeyboardResponse,
+        choices: [" "],
+        stimulus: `
+            <div style="font-size:28px;line-height:1.4;">
+                <p><strong>Practice Phase</strong></p>
+                <p>You will now complete ${totalPracticeRounds} practice rounds.</p>
+                <p>Use this time to get used to the timing and key responses.</p>
+                <p>Press the space bar to start practice.</p>
+            </div>
+        `,
+    };
+
+    const practiceRounds = [];
+    for (let i = 1; i <= totalPracticeRounds; i += 1) {
+        practiceRounds.push(...buildRound(jsPsych, policy, i, true));
+    }
+
     const experimentRounds = [];
-    for (let i = 1; i <= totalRounds; i += 1) {
+    for (let i = 1; i <= totalExperimentRounds; i += 1) {
         experimentRounds.push(...buildRound(jsPsych, policy, i, false));
     }
+
+    const mainPhaseIntro = {
+        type: jsPsychHtmlKeyboardResponse,
+        choices: [" "],
+        stimulus: `
+            <div style="font-size:28px;line-height:1.4;">
+                <p><strong>Main Experiment Phase</strong></p>
+                <p>Practice is complete.</p>
+                <p>You will now complete ${totalExperimentRounds} scored rounds.</p>
+                <p>Press the space bar to begin the main experiment.</p>
+            </div>
+        `,
+    };
 
     const thanks = {
         type: jsPsychHtmlKeyboardResponse,
@@ -187,7 +230,7 @@ const startExperiment = async () => {
                 <div style="font-size:28px;line-height:1.4;">
                     <p>Thanks for participating!</p>
                     <p>Your accuracy: <strong>${accuracy}%</strong></p>
-                    <p>This experiment measures your capacity to chunk action sequences.</p>
+                    <p>This experiment was designed to measure the effect of <a href="https://en.wikipedia.org/wiki/Chunking_(psychology)">chunking</a> on performance in a simple computer game.</p>
                     <p>Press the space bar to finish.</p>
                 </div>
             `;
@@ -196,8 +239,11 @@ const startExperiment = async () => {
 
     const timeline = [
         preloadMoveImages,
-        instructions,
-        // ...practiceRounds,
+        instructionsBasics,
+        instructionsPolicy,
+        practicePhaseIntro,
+        ...practiceRounds,
+        mainPhaseIntro,
         ...experimentRounds,
         thanks,
     ];

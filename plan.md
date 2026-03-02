@@ -5,35 +5,48 @@ This experiment is intended to analyze how participants' performance in a game o
 
 ## Experiment
 ### Timeline
-The experiment will proceed roughly as follows:
+The experiment will proceed as follows:
 - Instructions will be displayed to the participant
 - One practice round
-- Several experimental rounds
-- Thank the participant
+- T experimental rounds
+- Thank the participant and briefly describe the experiment.
 
 ### Task
-Each task will count down "rock, paper, scissors, go" with a 1-second delay between each count. A response will be required before "go", otherwise the round will be counted as a loss. At "go", the computer's move is displayed to the user along with whether the round was counted as a win or loss. After a brief delay, the next round will automatically begin.
+The main task is to play Rock Paper Scissors against a computer opponent which plays according to a randomly assigned hidden policy. The policy is defined by the _chunk length_ and _key move_ such that the bot chooses random moves with uniform probability until it plays the key move, at which point it begins a deterministic sequence of _chunk length_ moves. After finishing the chunk sequence, it returns to random play.
 
-### I/O
-- Users will make their choice using the keys ["r", "p", "s"].
-- Both response time and win/loss status will be recorded
-- A win will be clearly depicted with a large green circle, and a loss with a large red X.
+The policy is defined in pseudocode as follows:
+```psuedocode
+all_moves = ["r", "p", "s"]
+key_move = random_sample(all_moves)
+chunk_length = random_int_inclusive(2, 5)
+chunk_moves = [move for move in all_moves if move != key_move]
+chunk = [key_move, ...random_sample(chunk_moves, chunk_length - 1)]
+phase = 0
 
-## Implementation
-The experiment will be implemented using jsPsych. Each participant will be assigned a random condition representing a particular hidden bot policy. Each bot policy is defined as a function of its own previous three moves, and is represented as a dictionary in a JSON file roughly as follows:
-
-```json
-{
-  "rrr": {
-    "p_r": 0.0,
-    "p_p": 0.5,
-    "p_s": 0.5
-  },
-  "rrp": {
-    "p_r": 0.0,
-    "p_p": 0.0,
-    "p_s": 1.0
-  },
+function next_move():
+  if phase == 0:
+    move = random_sample(all_moves)
+    if move != key_move:
+      return move
+  else:
+    move = chunk_moves[phase]
+  phase++
+  phase = phase % chunk_length  
+  return move
 ```
 
-The bot policy will be constructed using a specialized algorithm in future iterations, but for now, we will create a single dummy policy.
+The experiment will be conducted using a between-subjects paradigm, in which each subject is assigned a chunk length between 2 and 5 inclusive.
+
+### I/O
+- Each trial will count down "rock, paper, scissors, go" with a 1-second delay between each count. A response will be required before "go", otherwise the round will be counted as a loss.
+- Users will make their choice using the keys ["r", "p", "s"]. After a response, the countdown is interrupted and the experiment jumps to the "go" screen.
+- At "go", the computer's move is displayed to the user along with whether the round was counted as a win or loss. After a 1s delay, the next round will automatically begin.
+- Both response time and win/loss status will be recorded.
+- A win will be clearly depicted with a large green circle, and a loss with a large red X.
+- A loss due to response timeout will be reported to the user.
+- At the end of the experiment, display:
+    - the user's accuracy as a percentage
+    - the intent of the experiment to measure their capacity to chunk action sequences
+
+## Implementation
+The experiment will be implemented using jsPsych.

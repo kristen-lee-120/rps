@@ -29,7 +29,7 @@ const buildRound = (jsPsych, policy, botHistory, roundIndex, isPractice) => {
         stimulus:
             '<div style="text-align:center;"><div id="countdown" style="font-size:64px;font-weight:600;">Rock</div></div>',
         trial_duration: 3000,
-        response_ends_trial: false,
+        response_ends_trial: true,
         data: {
             trial_type: "rps",
             round_index: roundIndex,

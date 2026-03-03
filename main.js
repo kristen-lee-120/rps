@@ -6,34 +6,44 @@ const moveImagePaths = Object.values(keyToMove).map(
 );
 
 const winPairs = new Set(["r s", "p r", "s p"]);
+const moveCounters = { r: "p", p: "s", s: "r" };
 
 const randomChoice = (moves) => moves[Math.floor(Math.random() * moves.length)];
 
 const randomIntInclusive = (min, max) =>
     Math.floor(Math.random() * (max - min + 1)) + min;
 
-const buildChunkPolicy = () => {
-    const keyMove = randomChoice(allMoves);
-    const chunkLength = randomIntInclusive(2, 5);
-    const chunkMoves = allMoves.filter((move) => move !== keyMove);
-    const chunk = [keyMove];
-    for (let i = 1; i < chunkLength; i += 1) {
-        chunk.push(randomChoice(chunkMoves));
+class Policy {
+    constructor(chunk = null) {
+        this.phase = 0;
+
+        if (Array.isArray(chunk) && chunk.length > 0) {
+            this.chunk = [...chunk];
+            this.keyMove = chunk[0];
+            this.chunkLength = chunk.length;
+        } else {
+            this.keyMove = randomChoice(allMoves);
+            this.chunkLength = randomIntInclusive(2, 5);
+            const chunkMoves = allMoves.filter((move) => move !== this.keyMove);
+            this.chunk = [this.keyMove];
+            for (let i = 1; i < this.chunkLength; i += 1) {
+                this.chunk.push(randomChoice(chunkMoves));
+            }
+        }
     }
-    let phase = 0;
-    const nextMove = () => {
-        if (phase === 0) {
+
+    nextMove() {
+        if (this.phase === 0) {
             const move = randomChoice(allMoves);
-            if (move !== keyMove) {
+            if (move !== this.keyMove) {
                 return move;
             }
         }
-        const move = chunk[phase];
-        phase = (phase + 1) % chunkLength;
+        const move = this.chunk[this.phase];
+        this.phase = (this.phase + 1) % this.chunkLength;
         return move;
-    };
-    return { keyMove, chunkLength, chunk, nextMove };
-};
+    }
+}
 
 const computeOutcome = (playerMove, botMove, respondedBeforeGo) => {
     if (!respondedBeforeGo) return "loss";
@@ -42,7 +52,13 @@ const computeOutcome = (playerMove, botMove, respondedBeforeGo) => {
     return winPairs.has(`${playerMove} ${botMove}`) ? "win" : "loss";
 };
 
-const buildRound = (jsPsych, policy, roundIndex, isPractice) => {
+const buildRound = (
+    jsPsych,
+    policy,
+    roundIndex,
+    isPractice,
+    onRoundResolved = null,
+) => {
     let keyboardListener = null;
     const countdown = {
         type: jsPsychHtmlKeyboardResponse,
@@ -86,6 +102,9 @@ const buildRound = (jsPsych, policy, roundIndex, isPractice) => {
             data.outcome = outcome;
             data.responded_before_go = respondedBeforeGo;
             data.response_timeout = !respondedBeforeGo;
+            if (typeof onRoundResolved === "function") {
+                onRoundResolved(data);
+            }
         },
     };
 
@@ -129,18 +148,18 @@ const buildRound = (jsPsych, policy, roundIndex, isPractice) => {
 };
 
 const startExperiment = async () => {
-    const policy = buildChunkPolicy();
+    const experimentalPolicy = new Policy();
 
     const jsPsych = initJsPsych();
 
-    const condition = `chunk_length_${policy.chunkLength}`;
+    const condition = `chunk_length_${experimentalPolicy.chunkLength}`;
     jsPsych.data.addProperties({
         condition,
-        chunk_length: policy.chunkLength,
-        key_move: policy.keyMove,
-        chunk: policy.chunk.join(""),
+        chunk_length: experimentalPolicy.chunkLength,
+        key_move: experimentalPolicy.keyMove,
+        chunk: experimentalPolicy.chunk.join(""),
     });
-    console.log(`Chunk: ${policy.chunk.join(", ")}`);
+    console.log(`Chunk: ${experimentalPolicy.chunk.join(", ")}`);
 
     const instructionsBasics = {
         type: jsPsychHtmlKeyboardResponse,
@@ -174,6 +193,7 @@ const startExperiment = async () => {
             <div class="rps-copy">
                 <p>The sequence will never contain the move that triggered it.</p>
                 <p>For example, if <strong>rock</strong> is the trigger move, the sequence may be <strong>rock, paper, paper.</strong></p>
+                <p>Let's try some practice rounds using that sequence.</p>
                 <p>Press the space bar to continue.</p>
             </div>
         `,
@@ -185,30 +205,83 @@ const startExperiment = async () => {
         message: "<p>Loading game assets...</p>",
     };
 
-    const totalPracticeRounds = 5;
+    const practiceSequence = ["r", "p", "p"];
     const totalExperimentRounds = 100;
 
-    const practicePhaseIntro = {
-        type: jsPsychHtmlKeyboardResponse,
-        choices: [" "],
-        stimulus: `
-            <div class="rps-copy">
-                <p><strong>Practice Phase</strong></p>
-                <p>You will now complete ${totalPracticeRounds} practice rounds.</p>
-                <p>Use this time to get used to the timing and key responses.</p>
-                <p>Press the space bar to start practice.</p>
-            </div>
-        `,
+    let practiceRoundIndex = 0;
+    let practiceComplete = false;
+    let showPracticeReminder = false;
+    let successfulPracticeRuns = 0;
+    let pendingPracticeCounters = [];
+    const practicePolicy = new Policy(practiceSequence);
+
+    const onPracticeRoundResolved = (data) => {
+        practiceRoundIndex += 1;
+        data.round_index = practiceRoundIndex;
+        showPracticeReminder = false;
+
+        if (pendingPracticeCounters.length > 0) {
+            const expectedCounter = pendingPracticeCounters[0];
+            const predictedCorrectly =
+                data.responded_before_go &&
+                data.player_move === expectedCounter;
+
+            if (predictedCorrectly) {
+                pendingPracticeCounters.shift();
+                if (pendingPracticeCounters.length === 0) {
+                    successfulPracticeRuns += 1;
+                    practiceComplete = successfulPracticeRuns >= 2;
+                }
+            } else {
+                pendingPracticeCounters = [];
+                showPracticeReminder = true;
+            }
+            return;
+        }
+
+        if (data.bot_move === practiceSequence[0]) {
+            pendingPracticeCounters = practiceSequence
+                .slice(1)
+                .map((move) => moveCounters[move]);
+        }
     };
 
-    const practiceRounds = [];
-    for (let i = 1; i <= totalPracticeRounds; i += 1) {
-        practiceRounds.push(...buildRound(jsPsych, policy, i, true));
-    }
+    const practiceReminderNode = {
+        timeline: [
+            {
+                type: jsPsychHtmlKeyboardResponse,
+                choices: [" "],
+                stimulus: `
+                    <div class="rps-copy">
+                        <p><strong>Hint:</strong> when the computer plays <strong>rock</strong>, it will continue with <strong>paper, paper</strong>.</p>
+                        <p>To counter that sequence, play <strong>scissors, scissors</strong> on the next two rounds.</p>
+                        <p>Press the space bar to continue practice.</p>
+                    </div>
+                `,
+            },
+        ],
+        conditional_function: () => showPracticeReminder,
+    };
+
+    const practiceLoop = {
+        timeline: [
+            ...buildRound(
+                jsPsych,
+                practicePolicy,
+                0,
+                true,
+                onPracticeRoundResolved,
+            ),
+            practiceReminderNode,
+        ],
+        loop_function: () => !practiceComplete,
+    };
 
     const experimentRounds = [];
     for (let i = 1; i <= totalExperimentRounds; i += 1) {
-        experimentRounds.push(...buildRound(jsPsych, policy, i, false));
+        experimentRounds.push(
+            ...buildRound(jsPsych, experimentalPolicy, i, false),
+        );
     }
 
     const mainPhaseIntro = {
@@ -216,10 +289,10 @@ const startExperiment = async () => {
         choices: [" "],
         stimulus: `
             <div class="rps-copy">
-                <p><strong>Main Experiment Phase</strong></p>
-                <p>Practice is complete.</p>
-                <p>You will now complete ${totalExperimentRounds} scored rounds.</p>
-                <p>Press the space bar to begin the main experiment.</p>
+                <p>Well done! You've completed the practice rounds.</p>
+                <p>You'll now begin the scored rounds.</p>
+                <p>Pay attention: the pattern may change, and may be shorter or longer than the practice sequence.</p>
+                <p>Press the space bar to begin.</p>
             </div>
         `,
     };
@@ -253,8 +326,7 @@ const startExperiment = async () => {
         instructionsBasics,
         instructionsPolicy1,
         instructionsPolicy2,
-        practicePhaseIntro,
-        ...practiceRounds,
+        practiceLoop,
         mainPhaseIntro,
         ...experimentRounds,
         thanks,

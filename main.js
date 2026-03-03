@@ -48,7 +48,7 @@ const buildRound = (jsPsych, policy, roundIndex, isPractice) => {
         type: jsPsychHtmlKeyboardResponse,
         choices: allMoves,
         stimulus:
-            '<div style="text-align:center;"><div id="countdown" style="font-size:64px;font-weight:600;">Rock</div></div>',
+            '<div style="text-align:center;"><div id="countdown" style="font-size:64px;font-weight:600;">Rock...</div></div>',
         trial_duration: 3000,
         response_ends_trial: true,
         data: {
@@ -60,10 +60,10 @@ const buildRound = (jsPsych, policy, roundIndex, isPractice) => {
             const display = jsPsych.getDisplayElement();
             const target = display.querySelector("#countdown");
             jsPsych.pluginAPI.setTimeout(() => {
-                if (target) target.textContent = "Paper";
+                if (target) target.textContent = "Paper...";
             }, 1000);
             jsPsych.pluginAPI.setTimeout(() => {
-                if (target) target.textContent = "Scissors";
+                if (target) target.textContent = "Scissors...";
             }, 2000);
         },
         on_finish: (data) => {
@@ -155,15 +155,26 @@ const startExperiment = async () => {
             </div>
         `,
     };
-    const instructionsPolicy = {
+    const instructionsPolicy1 = {
         type: jsPsychHtmlKeyboardResponse,
         choices: [" "],
         stimulus: `
             <div style="font-size:28px;line-height:1.4;">
                 <p>The computer does not play completely randomly.</p>
-                <p>Look out for the <i>key move</i>: if the computer plays the key move, it will start a short sequence.</p>
+                <p>When the computer plays <strong>one</strong> of the three moves, it will trigger a <strong>short sequence</strong>.</p>
                 <p>If you spot the pattern, you can use it to your advantage!</p>
-                <p>Press the space bar to begin.</p>
+                <p>Press the space bar to continue.</p>
+            </div>
+        `,
+    };
+    const instructionsPolicy2 = {
+        type: jsPsychHtmlKeyboardResponse,
+        choices: [" "],
+        stimulus: `
+            <div style="font-size:28px;line-height:1.4;">
+                <p>The sequence will never contain the move that triggered it.</p>
+                <p>For example, if <strong>rock</strong> is the trigger move, the sequence may be <strong>rock, paper, paper.</strong></p>
+                <p>Press the space bar to continue.</p>
             </div>
         `,
     };
@@ -175,7 +186,7 @@ const startExperiment = async () => {
     };
 
     const totalPracticeRounds = 5;
-    const totalExperimentRounds = 50;
+    const totalExperimentRounds = 100;
 
     const practicePhaseIntro = {
         type: jsPsychHtmlKeyboardResponse,
@@ -240,7 +251,8 @@ const startExperiment = async () => {
     const timeline = [
         preloadMoveImages,
         instructionsBasics,
-        instructionsPolicy,
+        instructionsPolicy1,
+        instructionsPolicy2,
         practicePhaseIntro,
         ...practiceRounds,
         mainPhaseIntro,

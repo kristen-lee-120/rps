@@ -48,7 +48,7 @@ const buildRound = (jsPsych, policy, roundIndex, isPractice) => {
         type: jsPsychHtmlKeyboardResponse,
         choices: allMoves,
         stimulus:
-            '<div style="text-align:center;"><div id="countdown" style="font-size:64px;font-weight:600;">Rock...</div></div>',
+            '<div id="countdown" class="rps-countdown">Rock...</div>',
         trial_duration: 3000,
         response_ends_trial: true,
         data: {
@@ -105,20 +105,20 @@ const buildRound = (jsPsych, policy, roundIndex, isPractice) => {
             const timedOut = last.response_timeout;
             const indicator =
                 outcome === "win"
-                    ? '<div style="font-size:80px;color:#22c55e;font-weight:700;">O</div>'
-                    : '<div style="font-size:80px;color:#ef4444;font-weight:700;">X</div>';
+                    ? '<div class="rps-indicator rps-indicator-win">O</div>'
+                    : '<div class="rps-indicator rps-indicator-loss">X</div>';
             const botLabel = botMove ? moveToLabel[botMove] : "Unknown";
             const imageName = botMove ? keyToMove[botMove] : null;
             const imageTag = imageName
-                ? `<img src="images/${imageName}.png" alt="${botLabel}" style="width:240px;height:auto;margin:12px auto 24px;display:block;" />`
+                ? `<img src="images/${imageName}.png" alt="${botLabel}" class="rps-bot-image" />`
                 : "";
             const timeoutTag = timedOut
-                ? '<div style="font-size:28px;color:#ef4444;margin-bottom:20px;">Too slow! No response before Go.</div>'
+                ? '<div class="rps-timeout">Too slow! No response before Go.</div>'
                 : "";
             return `
                 ${timeoutTag}
-                <div style="font-size:48px;font-weight:600;margin-bottom:20px;">Go!</div>
-                <div style="font-size:32px;margin-bottom:12px;">Computer played: ${botLabel}</div>
+                <div class="rps-go">Go!</div>
+                <div class="rps-bot-played">Computer played: ${botLabel}</div>
                 ${imageTag}
                 ${indicator}
             `;
@@ -146,7 +146,7 @@ const startExperiment = async () => {
         type: jsPsychHtmlKeyboardResponse,
         choices: [" "],
         stimulus: `
-            <div style="font-size:28px;line-height:1.4;">
+            <div class="rps-copy">
                 <p>In this task you will play Rock Paper Scissors.</p>
                 <p>Use the keys <strong>R</strong>, <strong>P</strong>, and <strong>S</strong> to respond.</p>
                 <p>The game will count down: rock, paper, scissors.</p>
@@ -159,7 +159,7 @@ const startExperiment = async () => {
         type: jsPsychHtmlKeyboardResponse,
         choices: [" "],
         stimulus: `
-            <div style="font-size:28px;line-height:1.4;">
+            <div class="rps-copy">
                 <p>The computer does not play completely randomly.</p>
                 <p>When the computer plays <strong>one</strong> of the three moves, it will trigger a <strong>short sequence</strong>.</p>
                 <p>If you spot the pattern, you can use it to your advantage!</p>
@@ -171,7 +171,7 @@ const startExperiment = async () => {
         type: jsPsychHtmlKeyboardResponse,
         choices: [" "],
         stimulus: `
-            <div style="font-size:28px;line-height:1.4;">
+            <div class="rps-copy">
                 <p>The sequence will never contain the move that triggered it.</p>
                 <p>For example, if <strong>rock</strong> is the trigger move, the sequence may be <strong>rock, paper, paper.</strong></p>
                 <p>Press the space bar to continue.</p>
@@ -192,7 +192,7 @@ const startExperiment = async () => {
         type: jsPsychHtmlKeyboardResponse,
         choices: [" "],
         stimulus: `
-            <div style="font-size:28px;line-height:1.4;">
+            <div class="rps-copy">
                 <p><strong>Practice Phase</strong></p>
                 <p>You will now complete ${totalPracticeRounds} practice rounds.</p>
                 <p>Use this time to get used to the timing and key responses.</p>
@@ -215,7 +215,7 @@ const startExperiment = async () => {
         type: jsPsychHtmlKeyboardResponse,
         choices: [" "],
         stimulus: `
-            <div style="font-size:28px;line-height:1.4;">
+            <div class="rps-copy">
                 <p><strong>Main Experiment Phase</strong></p>
                 <p>Practice is complete.</p>
                 <p>You will now complete ${totalExperimentRounds} scored rounds.</p>
@@ -238,7 +238,7 @@ const startExperiment = async () => {
             const wins = trials.filter({ outcome: "win" }).count();
             const accuracy = total > 0 ? Math.round((wins / total) * 100) : 0;
             return `
-                <div style="font-size:28px;line-height:1.4;">
+                <div class="rps-copy">
                     <p>Thanks for participating!</p>
                     <p>Your accuracy: <strong>${accuracy}%</strong></p>
                     <p>This experiment was designed to measure the effect of <a href="https://en.wikipedia.org/wiki/Chunking_(psychology)">chunking</a> on performance in a simple computer game.</p>

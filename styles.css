@@ -1,0 +1,47 @@
+.rps-countdown {
+    text-align: center;
+    font-size: 64px;
+    font-weight: 600;
+}
+
+.rps-indicator {
+    font-size: 80px;
+    font-weight: 700;
+}
+
+.rps-indicator-win {
+    color: #22c55e;
+}
+
+.rps-indicator-loss {
+    color: #ef4444;
+}
+
+.rps-bot-image {
+    width: 240px;
+    height: auto;
+    margin: 12px auto 24px;
+    display: block;
+}
+
+.rps-timeout {
+    font-size: 28px;
+    color: #ef4444;
+    margin-bottom: 20px;
+}
+
+.rps-go {
+    font-size: 48px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.rps-bot-played {
+    font-size: 32px;
+    margin-bottom: 12px;
+}
+
+.rps-copy {
+    font-size: 28px;
+    line-height: 1.4;
+}

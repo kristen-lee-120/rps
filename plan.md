@@ -52,6 +52,6 @@ The experiment will be conducted using a between-subjects paradigm, in which eac
 The experiment will be implemented using jsPsych.
 
 ### TODO:
+- Use the example sequence described in the instructions for the practice rounds.
 - Add a progress bar to indicate completion progress through main experiment
-- The inline CSS is verbose and repetitive. Use an external stylesheet.
 - Ending the countdown early might be confusing for users. Instead, consider allowing the countdown to continue, but be sure to give visual feedback when the user selects a move.

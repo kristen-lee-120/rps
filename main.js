@@ -150,7 +150,11 @@ const buildRound = (
 const startExperiment = async () => {
     const experimentalPolicy = new Policy();
 
-    const jsPsych = initJsPsych();
+    const jsPsych = initJsPsych({
+        show_progress_bar: true,
+        auto_update_progress_bar: false,
+        message_progress_bar: "Main experiment progress",
+    });
 
     const condition = `chunk_length_${experimentalPolicy.chunkLength}`;
     jsPsych.data.addProperties({
@@ -207,6 +211,7 @@ const startExperiment = async () => {
 
     const practiceSequence = ["r", "p", "p"];
     const totalExperimentRounds = 100;
+    let completedExperimentRounds = 0;
 
     let practiceRoundIndex = 0;
     let practiceComplete = false;
@@ -246,6 +251,12 @@ const startExperiment = async () => {
         }
     };
 
+    const onExperimentRoundResolved = () => {
+        completedExperimentRounds += 1;
+        jsPsych.progressBar.progress =
+            completedExperimentRounds / totalExperimentRounds;
+    };
+
     const practiceReminderNode = {
         timeline: [
             {
@@ -280,18 +291,33 @@ const startExperiment = async () => {
     const experimentRounds = [];
     for (let i = 1; i <= totalExperimentRounds; i += 1) {
         experimentRounds.push(
-            ...buildRound(jsPsych, experimentalPolicy, i, false),
+            ...buildRound(
+                jsPsych,
+                experimentalPolicy,
+                i,
+                false,
+                onExperimentRoundResolved,
+            ),
         );
     }
+
+    const startMainProgress = {
+        type: jsPsychCallFunction,
+        func: () => {
+            completedExperimentRounds = 0;
+            jsPsych.progressBar.progress = 0;
+        },
+    };
 
     const mainPhaseIntro = {
         type: jsPsychHtmlKeyboardResponse,
         choices: [" "],
         stimulus: `
             <div class="rps-copy">
-                <p>Well done! You've completed the practice rounds.</p>
+                <p>Well done! You're getting the hang of this.</p>
                 <p>You'll now begin the scored rounds.</p>
-                <p>Pay attention: the pattern may change, and may be shorter or longer than the practice sequence.</p>
+                <p><strong>Pay attention:</strong> the pattern may change, and may be shorter or longer than the practice sequence.</p>
+                <p>Remember, the pattern will never contain the move that triggered it.</p>
                 <p>Press the space bar to begin.</p>
             </div>
         `,
@@ -328,6 +354,7 @@ const startExperiment = async () => {
         instructionsPolicy2,
         practiceLoop,
         mainPhaseIntro,
+        startMainProgress,
         ...experimentRounds,
         thanks,
     ];

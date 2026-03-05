@@ -163,6 +163,12 @@ const startExperiment = async () => {
         message_progress_bar: "Main experiment progress",
     });
 
+    var random_id = jsPsych.randomization.randomID(10); 1
+    var filename = `${random_id}.csv`;
+    jsPsych.data.addProperties({
+      random_id: random_id,
+    });  
+
     const condition = `chunk_length_${experimentalPolicy.chunkLength}`;
     jsPsych.data.addProperties({
         condition,
@@ -218,7 +224,7 @@ const startExperiment = async () => {
     };
 
     const practiceSequence = ["r", "p", "p"];
-    const totalExperimentRounds = 100;
+    const totalExperimentRounds = 10;
     let completedExperimentRounds = 0;
 
     let practiceRoundIndex = 0;
@@ -331,6 +337,14 @@ const startExperiment = async () => {
         `,
     };
 
+    const saveData = {
+        type: jsPsychPipe,
+        action: "save",
+        experiment_id: "bJHBtUK5dUc8",
+        filename: filename,
+        data_string: ()=>jsPsych.data.get().csv()
+    };
+
     const thanks = {
         type: jsPsychHtmlKeyboardResponse,
         choices: [" "],
@@ -360,10 +374,11 @@ const startExperiment = async () => {
         instructionsBasics,
         instructionsPolicy1,
         instructionsPolicy2,
-        practiceLoop,
+        // practiceLoop,
         mainPhaseIntro,
         startMainProgress,
         ...experimentRounds,
+        saveData,
         thanks,
     ];
 

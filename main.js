@@ -64,7 +64,12 @@ const buildRound = (
         type: jsPsychHtmlKeyboardResponse,
         choices: allMoves,
         stimulus:
-            '<div id="countdown" class="rps-countdown">Rock...</div>',
+            `
+                <div class="rps-copy">
+                    <p>Choose your move with <strong>R</strong>, <strong>P</strong>, or <strong>S</strong> before the timer reaches 0.</p>
+                    <div id="countdown" class="rps-countdown">3</div>
+                </div>
+            `,
         trial_duration: 3000,
         response_ends_trial: true,
         data: {
@@ -76,10 +81,10 @@ const buildRound = (
             const display = jsPsych.getDisplayElement();
             const target = display.querySelector("#countdown");
             jsPsych.pluginAPI.setTimeout(() => {
-                if (target) target.textContent = "Paper...";
+                if (target) target.textContent = "2";
             }, 1000);
             jsPsych.pluginAPI.setTimeout(() => {
-                if (target) target.textContent = "Scissors...";
+                if (target) target.textContent = "1";
             }, 2000);
         },
         on_finish: (data) => {
@@ -126,6 +131,7 @@ const buildRound = (
                 outcome === "win"
                     ? '<div class="rps-indicator rps-indicator-win">O</div>'
                     : '<div class="rps-indicator rps-indicator-loss">X</div>';
+            const outcomeLabel = outcome === "win" ? "Win" : "Loss";
             const botLabel = botMove ? moveToLabel[botMove] : "Unknown";
             const imageName = botMove ? keyToMove[botMove] : null;
             const imageTag = imageName
@@ -138,6 +144,7 @@ const buildRound = (
                 ${timeoutTag}
                 <div class="rps-go">Go!</div>
                 <div class="rps-bot-played">Computer played: ${botLabel}</div>
+                <div class="rps-outcome">Result: ${outcomeLabel}</div>
                 ${imageTag}
                 ${indicator}
             `;
@@ -172,8 +179,9 @@ const startExperiment = async () => {
             <div class="rps-copy">
                 <p>In this task you will play Rock Paper Scissors.</p>
                 <p>Use the keys <strong>R</strong>, <strong>P</strong>, and <strong>S</strong> to respond.</p>
-                <p>The game will count down: rock, paper, scissors.</p>
-                <p>You must respond before "Go!" or the round will count as a loss.</p>
+                <p>Each round shows a countdown from <strong>3</strong> to <strong>1</strong>.</p>
+                <p>You must respond before the countdown reaches <strong>0</strong>, or the round counts as a loss.</p>
+                <p>As soon as you respond, the countdown ends and the result screen appears.</p>
                 <p>Press the space bar to continue.</p>
             </div>
         `,
@@ -196,7 +204,7 @@ const startExperiment = async () => {
         stimulus: `
             <div class="rps-copy">
                 <p>The sequence will never contain the move that triggered it.</p>
-                <p>For example, if <strong>rock</strong> is the trigger move, the sequence may be <strong>rock, paper, paper.</strong></p>
+                <p>For example, if <strong>rock</strong> is the trigger move, the sequence may be <strong>paper, paper.</strong></p>
                 <p>Let's try some practice rounds using that sequence.</p>
                 <p>Press the space bar to continue.</p>
             </div>

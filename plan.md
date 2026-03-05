@@ -38,9 +38,9 @@ function next_move():
 The experiment will be conducted using a between-subjects paradigm, in which each subject is assigned a chunk length between 2 and 5 inclusive.
 
 ### I/O
-- Each trial will count down "rock, paper, scissors, go" with a 1-second delay between each count. A response will be required before "go", otherwise the round will be counted as a loss.
-- Users will make their choice using the keys ["r", "p", "s"]. After a response, the countdown is interrupted and the experiment jumps to the "go" screen.
-- At "go", the computer's move is displayed to the user along with whether the round was counted as a win or loss. After a 1s delay, the next round will automatically begin.
+- Each trial will count down from 3. A response will be required before the countdown reaches 0, otherwise the round will be counted as a loss.
+- Users will make their choice using the keys ["r", "p", "s"]. After a response, the countdown is interrupted and the experiment jumps to the result screen.
+- The result screen will display the computer's move, whether the round was counted as a win or loss, and optionally a notice that the user failed to respond in time. After a brief delay, the next round will automatically begin.
 - Both response time and win/loss status will be recorded.
 - A win will be clearly depicted with a large green circle, and a loss with a large red X.
 - A loss due to response timeout will be reported to the user.
@@ -52,5 +52,4 @@ The experiment will be conducted using a between-subjects paradigm, in which eac
 The experiment will be implemented using jsPsych.
 
 ### TODO:
-- Add a progress bar to indicate completion progress through main experiment
 - Ending the countdown early might be confusing for users. Instead, consider allowing the countdown to continue, but be sure to give visual feedback when the user selects a move.

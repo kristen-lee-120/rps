@@ -96,6 +96,7 @@ const buildRound = (
                 respondedBeforeGo && responseKey && keyToMove[responseKey]
                     ? responseKey
                     : null;
+            const policyPhase = policy.phase;
             const botMove = policy.nextMove();
             const outcome = computeOutcome(
                 playerMove,
@@ -104,6 +105,7 @@ const buildRound = (
             );
             data.player_move = playerMove;
             data.bot_move = botMove;
+            data.policy_phase = policyPhase;
             data.outcome = outcome;
             data.responded_before_go = respondedBeforeGo;
             data.response_timeout = !respondedBeforeGo;
@@ -224,7 +226,7 @@ const startExperiment = async () => {
     };
 
     const practiceSequence = ["r", "p", "p"];
-    const totalExperimentRounds = 10;
+    const totalExperimentRounds = 100;
     let completedExperimentRounds = 0;
 
     let practiceRoundIndex = 0;
@@ -374,7 +376,7 @@ const startExperiment = async () => {
         instructionsBasics,
         instructionsPolicy1,
         instructionsPolicy2,
-        // practiceLoop,
+        practiceLoop,
         mainPhaseIntro,
         startMainProgress,
         ...experimentRounds,

@@ -347,6 +347,27 @@ const startExperiment = async () => {
         data_string: ()=>jsPsych.data.get().csv()
     };
 
+    const optionalFeedbackSurvey = {
+        type: jsPsychSurveyText,
+        preamble: `
+            <div class="rps-copy">
+                <p>(Optional) Is there anything you'd like us to know?</p>
+            </div>
+        `,
+        questions: [
+            {
+                prompt: "Give us feedback below.",
+                rows: 5,
+                columns: 60,
+                required: false,
+            },
+        ],
+        button_label: "Continue",
+        data: {
+            task_phase: "optional_feedback",
+        },
+    };
+
     const thanks = {
         type: jsPsychHtmlKeyboardResponse,
         choices: [" "],
@@ -380,6 +401,7 @@ const startExperiment = async () => {
         mainPhaseIntro,
         startMainProgress,
         ...experimentRounds,
+        optionalFeedbackSurvey,
         saveData,
         thanks,
     ];

@@ -2,7 +2,7 @@ const consentFormCopy = {
     title: "Chunking in Rock, Paper, Scissors",
     investigators: [
         "Daniel Mulford (reddit: @dgmulf)",
-        // "Kristen Lee",
+        "Kristen Lee",
         "Sara Tsai",
     ],
     purpose:

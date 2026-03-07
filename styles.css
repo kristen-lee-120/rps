@@ -17,6 +17,10 @@
     color: #ef4444;
 }
 
+.rps-indicator-tie {
+    color: #a85114;
+}
+
 .rps-bot-image {
     width: 240px;
     height: auto;
@@ -49,4 +53,71 @@
 .rps-list-left {
     display: inline-block;
     text-align: left;
+}
+
+.consent-form {
+    max-width: 900px;
+    margin: 0 auto;
+    font-size: 18px;
+    line-height: 1.5;
+    text-align: left;
+}
+
+.consent-form h1 {
+    font-size: 36px;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.consent-form h2 {
+    font-size: 22px;
+    margin: 28px 0 8px;
+}
+
+.consent-form p,
+.consent-form li,
+.consent-form label {
+    font-size: 18px;
+}
+
+.consent-form ul {
+    margin: 8px 0 0 24px;
+}
+
+.consent-investigators {
+    padding-left: 20px;
+}
+
+.consent-panel {
+    max-height: 60vh;
+    overflow-y: auto;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    background: #fff;
+}
+
+.consent-fields {
+    display: grid;
+    gap: 16px;
+}
+
+.consent-fields input[type="text"] {
+    width: 100%;
+    max-width: 420px;
+    padding: 10px 12px;
+    font-size: 16px;
+    border: 1px solid #9ca3af;
+    border-radius: 8px;
+}
+
+.consent-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.consent-checkbox input {
+    margin-top: 5px;
 }

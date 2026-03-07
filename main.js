@@ -13,6 +13,62 @@ const randomChoice = (moves) => moves[Math.floor(Math.random() * moves.length)];
 const randomIntInclusive = (min, max) =>
     Math.floor(Math.random() * (max - min + 1)) + min;
 
+const renderConsentFormHtml = () => {
+    const investigators = consentFormCopy.investigators
+        .map((name) => `<li>${name}</li>`)
+        .join("");
+    const procedures = consentFormCopy.procedures
+        .map((item) => `<li>${item}</li>`)
+        .join("");
+
+    return `
+        <div class="consent-form">
+            <div class="consent-panel">
+                <h1>${consentFormCopy.title}</h1>
+                <p><strong>Researchers</strong></p>
+                <ul class="consent-investigators">${investigators}</ul>
+
+                <h2>Purpose of the Study</h2>
+                <p>${consentFormCopy.purpose}</p>
+
+                <h2>What You Will Do</h2>
+                <ul>${procedures}</ul>
+
+                <h2>Time Commitment</h2>
+                <p>${consentFormCopy.duration}</p>
+
+                <h2>Risks</h2>
+                <p>${consentFormCopy.risks}</p>
+
+                <h2>Benefits</h2>
+                <p>${consentFormCopy.benefits}</p>
+
+                <h2>Compensation</h2>
+                <p>${consentFormCopy.compensation}</p>
+
+                <h2>Confidentiality</h2>
+                <p>${consentFormCopy.confidentiality}</p>
+
+                <h2>Information Withheld</h2>
+                <p>${consentFormCopy.withholding}</p>
+
+                <h2>Voluntary Participation</h2>
+                <p>${consentFormCopy.voluntary}</p>
+
+                <h2>Questions</h2>
+                <p>${consentFormCopy.contact}</p>
+            </div>
+
+            <div class="consent-fields">
+                <label class="consent-checkbox">
+                    <input name="consent_agree" type="checkbox" value="yes" required />
+                    <span>I have read this form and consent to participate in this study.</span>
+                </label>
+            </div>
+        </div>
+    `;
+};
+
 class Policy {
     constructor(chunk = null) {
         this.phase = 0;
@@ -129,11 +185,20 @@ const buildRound = (
             const botMove = last.bot_move;
             const outcome = last.outcome;
             const timedOut = last.response_timeout;
-            const indicator =
-                outcome === "win"
-                    ? '<div class="rps-indicator rps-indicator-win">O</div>'
-                    : '<div class="rps-indicator rps-indicator-loss">X</div>';
-            const outcomeLabel = outcome === "win" ? "Win" : "Loss";
+            const isDisplayedTie =
+                last.responded_before_go &&
+                last.player_move &&
+                last.player_move === botMove;
+            const indicator = isDisplayedTie
+                ? '<div class="rps-indicator rps-indicator-tie">T</div>'
+                : outcome === "win"
+                  ? '<div class="rps-indicator rps-indicator-win">O</div>'
+                  : '<div class="rps-indicator rps-indicator-loss">X</div>';
+            const outcomeLabel = isDisplayedTie
+                ? "Tie"
+                : outcome === "win"
+                  ? "Win"
+                  : "Loss";
             const botLabel = botMove ? moveToLabel[botMove] : "Unknown";
             const imageName = botMove ? keyToMove[botMove] : null;
             const imageTag = imageName
@@ -222,6 +287,25 @@ const startExperiment = async () => {
         images: moveImagePaths,
         show_progress_bar: false,
         message: "<p>Loading game assets...</p>",
+    };
+
+    const consentForm = {
+        type: jsPsychSurveyHtmlForm,
+        preamble: `
+            <div class="rps-copy">
+                <p>Please review the consent form below before continuing.</p>
+            </div>
+        `,
+        html: renderConsentFormHtml(),
+        button_label: "I Consent",
+        data: {
+            task_phase: "consent",
+        },
+        on_finish: (data) => {
+            const response = data.response ?? {};
+            data.consent_name = response.consent_name ?? "";
+            data.consent_agree = response.consent_agree === "yes";
+        },
     };
 
     const practiceSequence = ["r", "p", "p"];
@@ -408,6 +492,7 @@ const startExperiment = async () => {
 
     const timeline = [
         preloadMoveImages,
+        consentForm,
         instructionsBasics,
         instructionsPolicy1,
         instructionsPolicy2,

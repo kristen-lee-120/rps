@@ -45,3 +45,8 @@
     font-size: 28px;
     line-height: 1.4;
 }
+
+.rps-list-left {
+    display: inline-block;
+    text-align: left;
+}

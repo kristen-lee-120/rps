@@ -178,7 +178,6 @@ const startExperiment = async () => {
         key_move: experimentalPolicy.keyMove,
         chunk: experimentalPolicy.chunk.join(""),
     });
-    console.log(`Chunk: ${experimentalPolicy.chunk.join(", ")}`);
 
     const instructionsBasics = {
         type: jsPsychHtmlKeyboardResponse,
@@ -325,15 +324,30 @@ const startExperiment = async () => {
         },
     };
 
-    const mainPhaseIntro = {
+    const mainPhaseIntro1 = {
         type: jsPsychHtmlKeyboardResponse,
         choices: [" "],
         stimulus: `
             <div class="rps-copy">
                 <p>Well done! You're getting the hang of this.</p>
                 <p>You'll now begin the scored rounds.</p>
-                <p><strong>Pay attention:</strong> the pattern may change, and may be shorter or longer than the practice sequence.</p>
-                <p>Remember, the pattern will never contain the move that triggered it.</p>
+                <p>Press the space bar to continue.</p>
+            </div>
+        `,
+    };
+
+    const mainPhaseIntro2 = {
+
+        type: jsPsychHtmlKeyboardResponse,
+        choices: [" "],
+        stimulus: `
+            <div class="rps-copy">
+                <p>The scored rounds will use a different pattern. Remember:</p>
+                <ul class="rps-list-left">
+                    <li>The sequence is always triggered by one of the three moves.</li>
+                    <li>The sequence will never contain the move that triggered it.</li>
+                    <li>There is only one sequence, and it never changes.</li>
+                </ul>
                 <p>Press the space bar to begin.</p>
             </div>
         `,
@@ -398,7 +412,8 @@ const startExperiment = async () => {
         instructionsPolicy1,
         instructionsPolicy2,
         practiceLoop,
-        mainPhaseIntro,
+        mainPhaseIntro1,
+        mainPhaseIntro2,
         startMainProgress,
         ...experimentRounds,
         optionalFeedbackSurvey,

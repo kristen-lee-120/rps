@@ -78,23 +78,23 @@ To evaluate this claim, we computed conditional policy complexity for the hidden
 
 \section{Results}
 
-Figure~\ref{fig:accuracy} shows the relationship between chunk length and accuracy on deterministic rounds. Across the retained responses, accuracy increased with chunk length ($R^2 = 0.585$, $p = 0.027$). Participants therefore appeared to perform better when the hidden policy contained longer deterministic stretches.
+Figure~\ref{fig:behavior} shows the relationship between chunk length and both behavioral outcomes. In the left panel, accuracy on deterministic rounds increased with chunk length ($R^2 = 0.585$, $p = 0.027$). Participants therefore appeared to perform better when the hidden policy contained longer deterministic stretches.
 
-\begin{figure}[t]
+Reaction time showed a more nuanced pattern (Figure~\ref{fig:behavior}, right panel). Instead of decreasing monotonically with chunk length, reaction time followed an inverse U-shaped trend that peaked at $L=3$ ($R^2 = 0.722$, $p = 0.041$). Even so, the overall shape is consistent with the idea that chunk length modulates the computational demands of the task, albeit not in a perfectly linear way.
+
+\begin{figure*}[t]
     \centering
-    \includegraphics[width=0.82\linewidth]{acc_vs_L.png}
-    \caption{Accuracy on deterministic rounds as a function of chunk length. The fitted trend reported in the analysis was positive ($R^2 = 0.585$, $p = 0.027$).}
-    \label{fig:accuracy}
-\end{figure}
-
-Reaction time showed a more nuanced pattern (Figure~\ref{fig:rt}). Instead of decreasing monotonically with chunk length, reaction time followed an inverse U-shaped trend that peaked at $L=3$ ($R^2 = 0.722$, $p = 0.041$). Even so, the overall shape is consistent with the idea that chunk length modulates the computational demands of the task, albeit not in a perfectly linear way.
-
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=0.82\linewidth]{rt_vs_L.png}
-    \caption{Mean reaction time as a function of chunk length. Reaction time followed an inverse U-shaped relationship, with the highest values around $L=3$ ($R^2 = 0.722$, $p = 0.041$).}
-    \label{fig:rt}
-\end{figure}
+    \begin{minipage}[t]{0.495\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{acc_vs_L.png}
+    \end{minipage}\hfill
+    \begin{minipage}[t]{0.495\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{rt_vs_L.png}
+    \end{minipage}
+    \caption{Behavioral results as a function of chunk length. Left: accuracy on deterministic rounds increased with chunk length, with a positive fitted trend ($R^2 = 0.585$, $p = 0.027$). Right: mean reaction time followed an inverse U-shaped relationship, with the highest values around $L=3$ ($R^2 = 0.722$, $p = 0.041$).}
+    \label{fig:behavior}
+\end{figure*}
 
 Because only 8 responses survived filtering, these results should be interpreted as preliminary. The positive accuracy trend is the clearest behavioral signal in the dataset. The reaction-time effect is suggestive but less cleanly aligned with a simple monotonic complexity account, particularly at shorter chunk lengths where the task may have been easy enough to learn quickly.
 

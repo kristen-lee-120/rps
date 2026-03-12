@@ -33,7 +33,7 @@ def _list_osf_csv_files(url: str = OSF_FILES_URL) -> list[dict]:
 def sync_osf(data_dir: Path | None = None) -> list[str]:
     """Download OSF CSVs into the local data directory and return paths."""
 
-    target_dir = (data_dir or DEFAULT_DATA_DIR) / "raw"
+    target_dir = (data_dir or DEFAULT_DATA_DIR)
     target_dir.mkdir(parents=True, exist_ok=True)
 
     for item in _list_osf_csv_files():

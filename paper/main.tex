@@ -1,0 +1,124 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{natbib}
+\usepackage{hyperref}
+\usepackage{setspace}
+
+\graphicspath{{plots/}}
+\setstretch{1.1}
+
+\title{Action Chunking in Rock--Paper--Scissors:\\
+Evidence for Multi-Step Conditional Policy Compression}
+\author{Draft manuscript}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Chunking is a strategy for grouping units of information in memory and is widely believed to reduce cognitive load under working-memory constraints. Recent information-theoretic work formalizes chunking in terms of policy compression: an agent's policy can be modeled as a noisy communication channel, and behavior reflects a trade-off between reward and coding cost \citep{gershman2021reward}. In a simple stimulus--response paradigm, \citet{lai2025action} argue that human chunking is governed by conditional policy complexity, the mutual information between state and action after conditioning on one previous timestep of state history. We attempt to replicate and extend this idea in a more natural sequential game. Participants played 100 rounds of Rock--Paper--Scissors against a computer opponent whose hidden policy alternated between random play and deterministic action chunks of length $L \in \{2,3,4,5\}$. Across the retained responses, accuracy on deterministic rounds increased with chunk length ($R^2 = 0.585$, $p = 0.027$), while reaction time showed an inverse U-shaped relationship that peaked at $L = 3$ ($R^2 = 0.722$, $p = 0.041$). We argue that these patterns are more consistent with policy complexity conditioned on multi-step history than with a one-step conditional account. Although the sample was small after filtering, the results suggest that chunking in this task is shaped by the amount of information needed to track latent policy phase across multiple previous timesteps.
+\end{abstract}
+
+\section{Introduction}
+
+Chunking has long been proposed as a mechanism for coping with the limited capacity of working memory. In Miller's classic formulation, recoding multiple items into a single chunk can increase the amount of usable information without increasing the apparent burden on short-term memory \citep{miller1956magical}. Since then, chunking has been documented across a wide range of domains, from verbal learning to expertise in chess, and has been implemented in computational models such as CHREST \citep{gobet2001chunking}. In sequential action settings, chunking is often associated with faster and more automatic responding because a series of actions can be executed as a unit rather than selected one-by-one \citep{dezfouli2012habits}.
+
+Recent work has reframed these ideas in information-theoretic terms. \citet{gershman2021reward} model action selection as a communication problem in which a policy maps states to actions under a capacity constraint. In that framework, policy complexity is quantified by the mutual information between states and actions,
+\[
+I(S;A) = \sum_{s,a} p(s,a)\log \frac{p(a \mid s)}{p(a)},
+\]
+and capacity limits imply a reward--complexity trade-off. Extending this idea to action chunking, \citet{lai2025action} argue that temporal structure can reduce the coding cost of a policy. Their account focuses on conditional policy complexity, in which the cost of selecting an action is reduced after conditioning on the immediately preceding state.
+
+This framework raises a natural question: what happens when successful prediction depends on more than one previous timestep? Many real sequential tasks contain latent structure that cannot be recovered from a single transition. In those settings, an agent may need to track a deeper history in order to infer which stage of a sequence is currently unfolding. If chunking is driven by representational cost, then performance should depend on policy complexity conditioned on all relevant history rather than only one prior state.
+
+We tested this idea in a Rock--Paper--Scissors (RPS) task with a partially deterministic computer opponent. The opponent played random moves until a hidden key move occurred, after which it emitted a deterministic chunk of length $L$. This design preserved uncertainty while creating stretches of predictable play that could, in principle, be learned and exploited by participants. Because the hidden phase of the policy cannot always be inferred from only the last move, our task distinguishes one-step conditional policy complexity from a fuller history-conditioned quantity. We predicted that conditions with lower effective complexity would yield higher accuracy and shorter reaction times.
+
+\section{Methods}
+
+\subsection{Task}
+
+Participants completed 100 rounds of RPS against a browser-based computer opponent. The opponent's hidden policy was defined by a chunk length $L$ and a key move $K$. While not in a chunk, the opponent sampled uniformly at random from \{\emph{rock}, \emph{paper}, \emph{scissors}\}. If the sampled move was not $K$, play remained random on the next trial. If the sampled move was $K$, the opponent entered a deterministic chunk of length $L$: the key move was followed by a fixed sequence of $L-1$ additional moves, after which the policy returned to random play.
+
+To distinguish random from predictable periods, we assigned each trial a \emph{policy phase} $\phi$. Trials generated during random play were labeled $\phi = 0$. Trials that followed the key move within a deterministic chunk were labeled $\phi \in \{1,\ldots,L-1\}$. The latter trials were the rounds on which an attentive participant could, in principle, anticipate the computer's next move.
+
+\subsection{Measures and exclusions}
+
+Our primary dependent variables were reaction time and accuracy. Accuracy was defined as the participant's average win rate on deterministic rounds only, that is, trials with $\phi > 0$. This restriction was necessary because random rounds are not informative about whether the participant learned the hidden structure.
+
+The analysis assumed that retained responses reflected successful policy learning. We therefore kept only responses with at least 70\% accuracy on deterministic rounds in the second half of the task. After learning that one participant had inspected the JavaScript console during the experiment, we conservatively excluded all responses with greater than 95\% overall accuracy. These filters were intended to remove both non-learners and likely invalid near-perfect runs.
+
+\subsection{Design and sample}
+
+The original design was between-subjects: each participant was to be assigned a single chunk-length condition with $L \in \{2,3,4,5\}$. In practice, recruitment constraints made that design difficult to sustain, so participants were permitted to submit multiple responses. The unit of analysis in this draft is therefore the response rather than the participant.
+
+We recruited a convenience sample of volunteers and obtained 48 total responses. After applying the learning and validity filters described above, 8 responses remained for analysis. The severe reduction in usable observations is important for interpreting all inferential results below.
+
+\subsection{Policy-complexity analysis}
+
+The theoretical motivation for the experiment was that the computer opponent's move process varies in informational complexity across chunk lengths. At the coarsest level, the dependence between consecutive opponent moves can be described by
+\[
+I(M_t; M_{t+1}),
+\]
+where $M_t \in \{\text{rock}, \text{paper}, \text{scissors}\}$ is the opponent's move at time $t$. However, predicting the next move requires more than the current move alone. In particular, the key move marks the start of a deterministic run, so the player must infer latent policy phase from recent history.
+
+To evaluate this claim, we computed conditional policy complexity for the hidden opponent process in two ways. First, we considered a one-step quantity, $I(M_t; M_{t+1} \mid M_{t-1})$, which parallels the formulation emphasized by \citet{lai2025action}. Second, we considered a full-history quantity, $I(M_t; M_{t+1} \mid M_{0:t-1})$, which conditions on all preceding moves in the current sequence. These quantities were calculated exactly by exhaustive enumeration of all hidden policies for each chunk length and independently checked using a simulation of 30{,}000 rounds across 256 sampled policies per condition. Source code for the experiment and analyses is available at \url{https://github.com/kristen-lee-120/rps}.
+
+\section{Results}
+
+Figure~\ref{fig:accuracy} shows the relationship between chunk length and accuracy on deterministic rounds. Across the retained responses, accuracy increased with chunk length ($R^2 = 0.585$, $p = 0.027$). Participants therefore appeared to perform better when the hidden policy contained longer deterministic stretches.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.82\linewidth]{acc_vs_L.png}
+    \caption{Accuracy on deterministic rounds as a function of chunk length. The fitted trend reported in the analysis was positive ($R^2 = 0.585$, $p = 0.027$).}
+    \label{fig:accuracy}
+\end{figure}
+
+Reaction time showed a more nuanced pattern (Figure~\ref{fig:rt}). Instead of decreasing monotonically with chunk length, reaction time followed an inverse U-shaped trend that peaked at $L=3$ ($R^2 = 0.722$, $p = 0.041$). Even so, the overall shape is consistent with the idea that chunk length modulates the computational demands of the task, albeit not in a perfectly linear way.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.82\linewidth]{rt_vs_L.png}
+    \caption{Mean reaction time as a function of chunk length. Reaction time followed an inverse U-shaped relationship, with the highest values around $L=3$ ($R^2 = 0.722$, $p = 0.041$).}
+    \label{fig:rt}
+\end{figure}
+
+Because only 8 responses survived filtering, these results should be interpreted as preliminary. The positive accuracy trend is the clearest behavioral signal in the dataset. The reaction-time effect is suggestive but less cleanly aligned with a simple monotonic complexity account, particularly at shorter chunk lengths where the task may have been easy enough to learn quickly.
+
+\section{Discussion}
+
+\subsection{Implications for conditional policy complexity}
+
+Our main theoretical claim is that the opponent policy in this RPS task is better characterized by \emph{multi-step} conditional policy complexity than by a one-step conditional formulation. The reason is structural. A participant does not merely need to know the last opponent move; they need to infer whether a key move has recently occurred and, if so, which position within the deterministic chunk is currently active. That latent phase is a function of move history rather than a single preceding observation.
+
+This distinction is illustrated in Figure~\ref{fig:cpc}. Exact calculations over the hidden-policy space showed that the full-history conditional quantity decreased monotonically with chunk length, from approximately 0.284 bits at $L=2$ to 0.162 bits at $L=5$. By contrast, the one-step conditional quantity remained clustered in a narrower range (roughly 0.24--0.28 bits) and did not cleanly separate all four chunk-length conditions. In other words, one previous move is insufficient to recover the structure that matters in this game, whereas deeper history reveals that longer chunks are, on average, less costly to predict once the latent phase is known.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.82\linewidth]{cpc.png}
+    \caption{Comparison of policy-complexity measures across chunk lengths. In this task, full-history conditioning distinguishes the hidden-policy conditions more clearly than a one-step conditional measure.}
+    \label{fig:cpc}
+\end{figure}
+
+Under that interpretation, the behavioral results make qualitative sense. Accuracy improved as chunk length increased, matching the decrease in full-history conditional complexity. Reaction time did not decrease monotonically, but the deviation is not fatal to the account. Short chunks may be easy to learn quickly, producing relatively fast responses despite weaker compression benefits, while intermediate chunks may temporarily impose the greatest monitoring cost before longer deterministic sequences become more exploitable. With a larger sample, it would be possible to test this explanation more directly.
+
+\subsection{Limitations}
+
+The study has substantial limitations. Most importantly, only 8 of 48 responses remained after filtering. This leaves the reported correlations vulnerable to idiosyncratic observations and limits the credibility of precise effect-size estimates. The shift from the intended between-subjects design to allowing multiple submissions also weakens independence assumptions, because some participants may have contributed more than one analyzed response.
+
+The task instructions were another likely source of noise. Early participant feedback suggested that some volunteers did not understand the computer opponent's hidden rule structure, and the instructions were clarified only after those responses had already been collected. This means the final dataset may mix better-understood later responses with noisier earlier ones. Finally, the exclusion of responses above 95\% accuracy was necessary for data integrity after a confirmed cheating incident, but it also highlights a general vulnerability of browser-based unsupervised experiments.
+
+\section{Conclusion}
+
+This draft provides preliminary evidence that chunking in a sequential RPS task is associated with multi-step conditional policy compression. Accuracy improved with chunk length, and reaction time varied systematically across chunk conditions, while exact complexity calculations showed that only a full-history conditional measure clearly distinguished the hidden policies used in the experiment. Given the small number of retained responses, these findings should be treated as suggestive rather than definitive. Even so, they support the broader idea that chunking depends on the amount of history an agent must encode in order to exploit temporal regularities in the environment.
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}
